@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Kafka-Performance" enabled="true">
+      <stringProp name="TestPlan.comments">Take Performance Of Producing</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.tearDown_on_shutdown">true</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Group 1" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stopthread</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1000</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">16</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">10</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <JSR223Sampler guiclass="TestBeanGUI" testclass="JSR223Sampler" testname="JSR223 Kafka Performance Sampler" enabled="true">
+          <stringProp name="cacheKey">true</stringProp>
+          <stringProp name="filename"></stringProp>
+          <stringProp name="parameters"></stringProp>
+          <stringProp name="script">import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.header.Headers;
+import org.apache.kafka.common.header.internals.RecordHeaders;
+
+
+Properties props = new Properties();
+props.put(&quot;zookeeper.connect&quot;, &quot;localhost:11211&quot;);
+props.put(&quot;bootstrap.servers&quot;, &quot;localhost:11002&quot;);
+props.put(&quot;key.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+props.put(&quot;value.serializer&quot;, &quot;org.apache.kafka.common.serialization.StringSerializer&quot;);
+props.put(&quot;compression.type&quot;, &quot;gzip&quot;);
+props.put(&quot;batch.size&quot;, &quot;16384&quot;);
+props.put(&quot;linger.ms&quot;, &quot;0&quot;);
+props.put(&quot;buffer.memory&quot;, &quot;33554432&quot;);
+props.put(&quot;acks&quot;, &quot;1&quot;);
+props.put(&quot;send.buffer.bytes&quot;, &quot;131072&quot;);
+props.put(&quot;receive.buffer.bytes&quot;, &quot;32768&quot;);
+props.put(&quot;security.protocol&quot;, &quot;PLAINTEXT&quot;);
+
+
+	
+
+KafkaProducer&lt;String, String&gt; producer = new KafkaProducer&lt;String, String&gt;(props);
+List&lt;Header&gt; headers = new ArrayList&lt;Header&gt;();
+        headers.add(new RecordHeader(&quot;schemaVersion&quot;, &quot;1.0&quot;.getBytes()));
+        headers.add(new RecordHeader(&quot;messageType&quot;,&quot;TEST-HEADER&quot;.getBytes()));
+
+String message = &apos;{&quot;schema&quot;:{&quot;type&quot;:&quot;struct&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;struct&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;id&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;product_variant_id&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;warehouse_id&quot;},{&quot;type&quot;:&quot;int32&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;sell_stock&quot;},{&quot;type&quot;:&quot;int32&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;reserve_stock&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;name&quot;:&quot;io.debezium.time.Timestamp&quot;,&quot;version&quot;:1,&quot;default&quot;:0,&quot;field&quot;:&quot;created_at&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;name&quot;:&quot;io.debezium.time.Timestamp&quot;,&quot;version&quot;:1,&quot;default&quot;:0,&quot;field&quot;:&quot;updated_at&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;orm_metadata&quot;}],&quot;optional&quot;:true,&quot;name&quot;:&quot;hypernova_inventory.Value&quot;,&quot;field&quot;:&quot;before&quot;},{&quot;type&quot;:&quot;struct&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;id&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;product_variant_id&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;warehouse_id&quot;},{&quot;type&quot;:&quot;int32&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;sell_stock&quot;},{&quot;type&quot;:&quot;int32&quot;,&quot;optional&quot;:false,&quot;default&quot;:0,&quot;field&quot;:&quot;reserve_stock&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;name&quot;:&quot;io.debezium.time.Timestamp&quot;,&quot;version&quot;:1,&quot;default&quot;:0,&quot;field&quot;:&quot;created_at&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;name&quot;:&quot;io.debezium.time.Timestamp&quot;,&quot;version&quot;:1,&quot;default&quot;:0,&quot;field&quot;:&quot;updated_at&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;orm_metadata&quot;}],&quot;optional&quot;:true,&quot;name&quot;:&quot;hypernova_inventory.Value&quot;,&quot;field&quot;:&quot;after&quot;},{&quot;type&quot;:&quot;struct&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;version&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;connector&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;name&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;ts_ms&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;name&quot;:&quot;io.debezium.data.Enum&quot;,&quot;version&quot;:1,&quot;parameters&quot;:{&quot;allowed&quot;:&quot;true,last,false,incremental&quot;},&quot;default&quot;:&quot;false&quot;,&quot;field&quot;:&quot;snapshot&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;db&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;sequence&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;table&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;server_id&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;gtid&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;file&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;pos&quot;},{&quot;type&quot;:&quot;int32&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;row&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;thread&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;query&quot;}],&quot;optional&quot;:false,&quot;name&quot;:&quot;io.debezium.connector.mysql.Source&quot;,&quot;field&quot;:&quot;source&quot;},{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;op&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:true,&quot;field&quot;:&quot;ts_ms&quot;},{&quot;type&quot;:&quot;struct&quot;,&quot;fields&quot;:[{&quot;type&quot;:&quot;string&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;id&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;total_order&quot;},{&quot;type&quot;:&quot;int64&quot;,&quot;optional&quot;:false,&quot;field&quot;:&quot;data_collection_order&quot;}],&quot;optional&quot;:true,&quot;field&quot;:&quot;transaction&quot;}],&quot;optional&quot;:false,&quot;name&quot;:&quot;hypernova_inventory.Envelope&quot;},&quot;payload&quot;:{&quot;before&quot;:null,&quot;after&quot;:{&quot;id&quot;:4,&quot;product_variant_id&quot;:27953,&quot;warehouse_id&quot;:1,&quot;sell_stock&quot;:1,&quot;reserve_stock&quot;:1,&quot;created_at&quot;:1656854659000,&quot;updated_at&quot;:1656854659000,&quot;orm_metadata&quot;:null},&quot;source&quot;:{&quot;version&quot;:&quot;1.8.1.Final&quot;,&quot;connector&quot;:&quot;mysql&quot;,&quot;name&quot;:&quot;hypernova-inventory&quot;,&quot;ts_ms&quot;:1656838459000,&quot;snapshot&quot;:&quot;false&quot;,&quot;db&quot;:&quot;inventory&quot;,&quot;sequence&quot;:null,&quot;table&quot;:&quot;warehouse_stocks&quot;,&quot;server_id&quot;:123456,&quot;gtid&quot;:&quot;ca1922e6-faa8-11ec-a495-0242ac1b0005:59&quot;,&quot;file&quot;:&quot;mysql-bin.000003&quot;,&quot;pos&quot;:43045,&quot;row&quot;:0,&quot;thread&quot;:null,&quot;query&quot;:null},&quot;op&quot;:&quot;c&quot;,&quot;ts_ms&quot;:1656838459049,&quot;transaction&quot;:null}}&apos;;
+
+Date latestdate = new Date();
+ProducerRecord&lt;String, String&gt; producerRecord = new ProducerRecord&lt;String, String&gt;(&quot;test-kafka-performance&quot;, null, latestdate.getTime(), null, message, headers);
+
+
+producer.send(producerRecord);
+
+producer.close();</stringProp>
+          <stringProp name="scriptLanguage">groovy</stringProp>
+        </JSR223Sampler>
+        <hashTree/>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
