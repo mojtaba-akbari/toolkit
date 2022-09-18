@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  rabbitmq:
+    build:
+      context: .
+    environment:
+      - RABBITMQ_PASSWORD=miladmk

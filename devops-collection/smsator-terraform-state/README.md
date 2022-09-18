@@ -1,0 +1,1 @@
+smsator stage terraform states

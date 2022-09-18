@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-storage-pv-extra
+  namespace: logging
+spec:
+  storageClassName: nfs-storage-class-extera
+  capacity:
+    storage: 1900Gi 
+  accessModes:
+    - ReadWriteMany 
+  nfs: 
+    path: /srv/nfs4/logging 
+    server: 10.0.0.106 

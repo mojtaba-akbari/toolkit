@@ -1,0 +1,18 @@
+image: registery.zooket.ir/docker:latest
+services:
+  - docker:dind
+
+stages:
+  - build
+
+variables:
+  CONTAINER_DEV_IMAGE: registry.zooket.ir/ciintegrationtest:$CI_COMMIT_SHA
+
+build_dev:
+  stage: build
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.zooket.ir
+    - docker build --pull -t $CONTAINER_DEV_IMAGE .
+    - docker push $CONTAINER_DEV_IMAGE
+  only:
+    - develop
