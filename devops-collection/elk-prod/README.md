@@ -1,1 +1,0 @@
-elk prod terraform state

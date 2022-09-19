@@ -1,3 +1,0 @@
-1- pg_dump -U kong -f kong.backup -F p -a kong
-2- docker cp [from container]:/tmp/kong.backup .
-3- for recovering ---> pg_restore 

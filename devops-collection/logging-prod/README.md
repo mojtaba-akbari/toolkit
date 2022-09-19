@@ -1,2 +1,0 @@
-
-Prod Logging namespace codes 

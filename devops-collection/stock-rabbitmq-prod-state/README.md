@@ -1,1 +1,0 @@
-Rabbitmq sotoon state

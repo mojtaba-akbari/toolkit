@@ -1,1 +1,0 @@
-Indexer redis terraformm state

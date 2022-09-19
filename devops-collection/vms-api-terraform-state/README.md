@@ -1,2 +1,0 @@
-
-vms-api terraform state
